@@ -1,4 +1,6 @@
 Hello everyone !
 please develop your code you branch and push to develop once it is dicussed.
 pushing in the MAIN is blocked.
+please share your ideas and the material links in the "Discussions".
+kindly use the proper message while commiting the changes.
 happy coding !!
