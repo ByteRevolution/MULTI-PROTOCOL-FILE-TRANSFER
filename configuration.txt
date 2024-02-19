@@ -1,0 +1,5 @@
+Add your ssh key in the settings.
+clone the repo using ssh.
+your branch is already there do not make new branch.
+  use git checkout feature_yourname
+code only on that branch only.
