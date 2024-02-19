@@ -1,3 +1,2 @@
 #!/bin/bash
- mkdir -p test1 
- cd test1
+ mkdir -p test1 && cd test1
