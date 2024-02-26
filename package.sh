@@ -10,7 +10,9 @@ check_package() {
     fi
 }
 
-install_package() {
+install_package() 
+{
+	echo Enter correct superuser password :
     sudo apt-get install -y "$1"
     if [ $? -eq 0 ]; then
         echo "$1 has been installed successfully."
@@ -18,11 +20,13 @@ install_package() {
         echo "Failed to install $1."
     fi
 }
-
-package_name="samba"
-
-check_package "$package_name"
+echo Dependency check for the samba sharing...
+sleep 1
+package_name=("samba"" ufw")
+for pkg in ${package_name[@]};do
+check_package "$pkg"
 if [ $? -ne 0 ]; then
-    install_package "$package_name"
+    install_package "$pkg"
 fi
+done
 
