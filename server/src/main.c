@@ -2,7 +2,7 @@
 #include "colors_effects.h"
 // Function to display menu
 void display_menu() {
-    printf(GREEN);
+    printf(YELLOW);
     printf("Samba Configuration Menu\n");
     printf("1\\ Configure an Existing Folder\n");
     printf("2/ Create and Configure a New Folder\n");
@@ -106,7 +106,7 @@ int main() {
     int choice;
     while (1) {
         display_menu();
-        PRINT_BOLD("enter your choice");
+        PRINT_BOLD("enter your choice :");
         scanf("%d", &choice);
         getchar(); // consume newline
         
