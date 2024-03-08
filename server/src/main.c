@@ -1,11 +1,14 @@
 #include "comman.h"
+#include "colors_effects.h"
 // Function to display menu
 void display_menu() {
+    printf(GREEN);
     printf("Samba Configuration Menu\n");
-    printf("1. Configure an Existing Folder\n");
-    printf("2. Create and Configure a New Folder\n");
-    printf("3. Restart Samba Service\n");
-    printf("4. Exit\n");
+    printf("1\\ Configure an Existing Folder\n");
+    printf("2/ Create and Configure a New Folder\n");
+    printf("3\\ Restart Samba Service\n");
+    printf("4/ Exit\n");
+    printf(RESET);
 }
 
 // Function to configure an existing folder
@@ -34,7 +37,7 @@ void configure_existing_folder() {
     // Add configuration to smb.conf
     FILE *smb_conf = fopen("/etc/samba/smb.conf", "a");
     if (smb_conf == NULL) {
-        printf("Failed to open smb.conf for writing.\n");
+        printf("Failed to open smb.conf for writing.\n");       
         return;
     }
     
@@ -97,10 +100,13 @@ void restart_samba_service() {
 
 // Main function
 int main() {
+    printf(RED);
+    system("bash ./server/src/package.sh");
+    printf(RESET);
     int choice;
     while (1) {
         display_menu();
-        printf("Enter your choice: ");
+        PRINT_BOLD("enter your choice");
         scanf("%d", &choice);
         getchar(); // consume newline
         

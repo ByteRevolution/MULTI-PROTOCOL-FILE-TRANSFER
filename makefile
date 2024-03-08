@@ -7,26 +7,27 @@ INCDIR = ./include
 OBJDIR = obj
 BINDIR = bin
 
-SRCS = $(wildcard $(SRCDIR1)/*.c)
-SRCS += $(wildcard $(SRCDIR2)/*.c)
-OBJS = $(SRCS:$(SRCDIR1)/%.c=$(OBJDIR)/%.o)
-OBJS += $(SRCS:$(SRCDIR2)/%.c=$(OBJDIR)/%.o)
+SRCS1 = $(wildcard $(SRCDIR1)/*.c)
+SRCS2 = $(wildcard $(SRCDIR2)/*.c)
+OBJS1 = $(SRCS1:$(SRCDIR1)/%.c=$(OBJDIR)/server/%.o)
+OBJS2 = $(SRCS2:$(SRCDIR2)/%.c=$(OBJDIR)/client/%.o)
 DEPS = $(wildcard $(INCDIR)/*.h)
 
 TARGET = $(BINDIR)/samba_conf
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS1) $(OBJS2)
 	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) -o $@ $^ -I$(INCDIR) 
 
+$(OBJDIR)/server/%.o: $(SRCDIR1)/%.c $(DEPS)
+	@mkdir -p $(OBJDIR)/server
+	$(CC) $(CFLAGS) -c -o $@ $< -I$(INCDIR)
 
-$(OBJDIR)/%.o: $(SRCDIR1)/%.c $(SRCDIR2)/%.c $(DEPS)
-	@mkdir -p $(OBJDIR)
-	$(CC) $(CFLAGS) -c -o $@ $< -I$(INCDIR) 	
-.PHONY: clean reset remove move
+$(OBJDIR)/client/%.o: $(SRCDIR2)/%.c $(DEPS)
+	@mkdir -p $(OBJDIR)/client
+	$(CC) $(CFLAGS) -c -o $@ $< -I$(INCDIR)
+
+.PHONY: clean
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
 
-
-print:
-	$(info $(OBJS) $(SRCS))
