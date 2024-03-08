@@ -1,83 +1,82 @@
+// Server side
+// (Accept connection, receive file, close connection)
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <unistd.h>
 #include <arpa/inet.h>
+#include <string.h>
+#include <libgen.h> // For basename function
 
-#define SIZE 1024
+#define PORT 8080
+#define BUFFER_SIZE 1024
 
+int main() {
+    int server_fd, new_socket;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
+    char buffer[BUFFER_SIZE];
 
-void write_file(int sockfd)
-{
-    int n;
-    FILE *fp;
-    char *filename = "file.jpg"; // Change filename as needed
-    char buffer[SIZE];
-
-    fp = fopen(filename, "wb"); // Open file in binary write mode
-    if (fp == NULL)
-    {
-        perror("[-]Error in creating file.");
-        exit(1);
+    // Create socket
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
     }
-    while (1)
-    {
-        n = recv(sockfd, buffer, SIZE, 0);
-        if (n <= 0)
-        {
-            break;
-        }
-        fwrite(buffer, 1, n, fp); // Write received binary data directly to file
-        bzero(buffer, SIZE);
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+
+    // Bind socket to localhost:PORT
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+        perror("Bind failed");
+        exit(EXIT_FAILURE);
     }
-    fclose(fp); // Close file after writing
-}
 
-
-
-int main ()
-{
-    char *ip = "192.168.207.30";
-    int port = 8080;
-    int e;
-
-    int sockfd, new_sock;
-    struct sockaddr_in server_addr, new_addr;
-    socklen_t addr_size;
-    char buffer[SIZE];
-
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if(sockfd<0)
-    {
-        perror("[-]Error in socket");
-        exit(1);
+    // Listen for incoming connections
+    if (listen(server_fd, 3) < 0) {
+        perror("Listen failed");
+        exit(EXIT_FAILURE);
     }
-     printf("[+]Server socket created. \n");
 
-     server_addr.sin_family = AF_INET;
-     server_addr.sin_port = port;
-     server_addr.sin_addr.s_addr = inet_addr(ip);
+    // Accept incoming connection
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
+        perror("Accept failed");
+        exit(EXIT_FAILURE);
+    }
 
-     e = bind(sockfd,(struct sockaddr*)&server_addr, sizeof(server_addr));
-     if(e<0)
-     {
-         perror("[-]Error in Binding");
-         exit(1);
-     }
-     printf("[+]Binding Successfull.\n");
+    // Receive file path from client
+    ssize_t path_length = recv(new_socket, buffer, BUFFER_SIZE, 0);
+    if (path_length <= 0) {
+        perror("Failed to receive file path");
+        exit(EXIT_FAILURE);
+    }
+    buffer[path_length] = '\0'; // Null terminate the file path
 
-     e = listen(sockfd, 10);
-     if(e==0)
-     {
-         printf("[+]Listening...\n");
-     }
-     else 
-     {
-         perror("[-]Error in Binding");
-         exit(1);
-     }
-     addr_size = sizeof(new_addr);
-     new_sock = accept(sockfd,(struct sockaddr*)&new_addr, &addr_size);
+    // Extract filename from the path
+    char *filename = basename(buffer);
+    printf("Received : %s\n", filename);
 
-     write_file(new_sock);
-     printf("[+]Data written in the file \n");
+    // Open file with the received file name for writing
+    FILE *file = fopen(filename, "wb");
+    if (!file) {
+        perror("File creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Receive and write file content
+    ssize_t bytes_received;
+    while ((bytes_received = recv(new_socket, buffer, BUFFER_SIZE, 0)) > 0) {
+        fwrite(buffer, 1, bytes_received, file);
+    }
+    if (bytes_received < 0) {
+        perror("Receive failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Close file and connection
+    fclose(file);
+    close(new_socket);
+    close(server_fd);
+    return 0;
 }
