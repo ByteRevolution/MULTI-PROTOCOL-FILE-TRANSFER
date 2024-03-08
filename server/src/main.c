@@ -33,6 +33,28 @@ void configure_existing_folder() {
         printf("System command not available.\n");
         return;
     }
+
+    if (system(NULL)) {
+        if (system("grep -q '^ByteRevolution:' /etc/passwd") != 0) {
+            if (system("sudo useradd ByteRevolution -m -s /sbin/nologin") != 0) {
+                printf("Failed to create user 'ByteRevolution'.\n");
+                return;
+            }
+            printf("User 'ByteRevolution' created.\n");
+        } else {
+            printf("User 'ByteRevolution' already exists.\n");
+        }
+
+        // Set password for the user
+        if (system("echo 'revolve' | sudo smbpasswd -a ByteRevolution") != 0) {
+            printf("Failed to set password for 'ByteRevolution'.\n");
+            return;
+        }
+        printf("Password set for user 'ByteRevolution'.\n");
+    } else {
+        printf("System command not available.\n");
+        return;
+    }
     
     // Add configuration to smb.conf
     FILE *smb_conf = fopen("/etc/samba/smb.conf", "a");
@@ -45,6 +67,7 @@ void configure_existing_folder() {
     fprintf(smb_conf, "   path = %s\n", folder_name);
     fprintf(smb_conf, "   browseable = yes\n");
     fprintf(smb_conf, "   writable = yes\n");
+    fprintf(smb_conf, "   valid users = ByteRevolution\n");
     
     fclose(smb_conf);
     
@@ -58,6 +81,29 @@ void create_and_configure_folder() {
     fgets(folder_name, sizeof(folder_name), stdin);
     folder_name[strcspn(folder_name, "\n")] = 0; // remove trailing newline
     
+
+    if (system(NULL)) {
+        if (system("grep -q '^ByteRevolution:' /etc/passwd") != 0) {
+            if (system("sudo useradd ByteRevolution -m -s /sbin/nologin") != 0) {
+                printf("Failed to create user 'ByteRevolution'.\n");
+                return;
+            }
+            printf("User 'ByteRevolution' created.\n");
+        } else {
+            printf("User 'ByteRevolution' already exists.\n");
+        }
+
+        // Set password for the user
+        if (system("echo 'revolve' | sudo smbpasswd -a ByteRevolution") != 0) {
+            printf("Failed to set password for 'ByteRevolution'.\n");
+            return;
+        }
+        printf("Password set for user 'ByteRevolution'.\n");
+    } else {
+        printf("System command not available.\n");
+        return;
+    }
+
     if (strlen(folder_name) == 0) {
         printf("Folder name cannot be empty.\n");
         return;
@@ -85,6 +131,7 @@ void create_and_configure_folder() {
     fprintf(smb_conf, "   path = %s/%s\n", getenv("PWD"), folder_name);
     fprintf(smb_conf, "   browseable = yes\n");
     fprintf(smb_conf, "   writable = yes\n");
+    fprintf(smb_conf, "   valid users = ByteRevolution\n");
     
     fclose(smb_conf);
     
