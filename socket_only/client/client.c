@@ -9,16 +9,33 @@
 #include <libgen.h> // For basename function
 
 #define PORT 8080
-#define IP "192.168.2.210"
+#define LCL_IP "127.0.0.1"
 #define BUFFER_SIZE 1024
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        printf("Usage: %s <filename>\n", argv[0]);
+
+    if( !(strcmp(argv[1],"--help")) || !(strcmp(argv[1],"-h")) ){
+        printf("Usage: %s SERVER_IP <filename>\n", argv[0]);
+        printf("No IP will configure localhost as a server \n");
+        return 1;
+        }
+
+    if (argc != 3 && argc != 2) {
+        printf("Usage: %s SERVER_IP <filename>\n", argv[0]);
+        printf("No IP will configure localhost as a server \n");
         return 1;
     }
 
-    FILE *file = fopen(argv[1], "rb");
+    FILE *file;
+
+    if(argc == 3){
+        file = fopen(argv[2], "rb");
+    }
+
+    if(argc == 2){
+        file = fopen(argv[1], "rb");
+    }
+
     if (!file) {
         perror("File opening failed");
         return 1;
@@ -38,10 +55,22 @@ int main(int argc, char *argv[]) {
     serv_addr.sin_port = htons(PORT);
 
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, IP, &serv_addr.sin_addr) <= 0) {
-        perror("Invalid address/ Address not supported");
-        fclose(file);
-        exit(EXIT_FAILURE);
+    if(argc == 2){
+        
+        if (inet_pton(AF_INET, LCL_IP, &serv_addr.sin_addr) <= 0) {
+            perror("Invalid address/ Address not supported");
+            fclose(file);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    if(argc == 3){
+        
+        if (inet_pton(AF_INET, argv[1], &serv_addr.sin_addr) <= 0) {
+            perror("Invalid address/ Address not supported");
+            fclose(file);
+            exit(EXIT_FAILURE);
+        }
     }
 
     // Connect to server
@@ -52,8 +81,15 @@ int main(int argc, char *argv[]) {
     }
 
     // Send filename to server
-    char *filename = basename(argv[1]);
-    send(sock, filename, strlen(filename), 0);
+    if(argc == 2){
+        char *filename = basename(argv[1]);
+        send(sock, filename, strlen(filename), 0);
+    }
+
+    if(argc == 3){
+        char *filename = basename(argv[2]);
+        send(sock, filename, strlen(filename), 0);
+    }
 
     // Read and send file content
     size_t bytes_read;
