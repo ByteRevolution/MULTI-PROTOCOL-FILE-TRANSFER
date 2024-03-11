@@ -43,6 +43,7 @@ int ssh() {
     printline(35);
     printf("Enter your username: ");
     fgets(user.username, sizeof(user.username), stdin);
+
     printf("Enter the IP address: ");
     fgets(user.ip, sizeof(user.ip), stdin);
     printline(35);
@@ -61,15 +62,39 @@ int ssh() {
     return 0;
 }
 
-/*int ssh()
-{
-    system("systemctl restart sshd");
-    printf("\n");
-    // Path to your shell script
-    char *scriptPath = "./ssh.sh";
+int ExistingUser() {
+    struct userinfo user;
+    int sr_no_exist;
 
-    // Execute the shell script
-    system(scriptPath);
+    FILE *fp=fopen("userinfo.bin","rb");
+    if(fp == NULL)
+    {
+        fprintf(stderr,"Error opening file\n");
+        exit(1);
+    }
+
+    printf("\n");
+    printline(20);
+    printf("Enter Sr No. : ");
+    scanf("%d",&sr_no_exist);
+    printline(20);
+
+    fseek(fp, (sr_no_exist - 1) * sizeof(struct userinfo), SEEK_SET);
+    fread(&user, sizeof(struct userinfo), 1, fp);
+
+    if(user.sr_no != sr_no_exist)
+    {
+        printf("No data available with this sr_no\n");
+        fclose(fp);
+        exit(1);
+    }
+
+    fclose(fp);
+
+    char command[200];
+    snprintf(command, sizeof(command), "./ssh.sh %s %s", user.username, user.ip);
+    system(command);
 
     return 0;
-}*/
+}
+
