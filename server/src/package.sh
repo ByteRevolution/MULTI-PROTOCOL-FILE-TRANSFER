@@ -21,7 +21,6 @@ install_package()
     fi
 }
 echo Dependency check for the samba sharing...
-sleep 1
 package_name=("samba"" ufw")
 for pkg in ${package_name[@]};do
 check_package "$pkg"

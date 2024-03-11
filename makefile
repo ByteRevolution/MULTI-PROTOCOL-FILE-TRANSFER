@@ -30,4 +30,5 @@ $(OBJDIR)/client/%.o: $(SRCDIR2)/%.c $(DEPS)
 .PHONY: clean
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
-
+run :
+	@sudo ./bin/samba_conf
