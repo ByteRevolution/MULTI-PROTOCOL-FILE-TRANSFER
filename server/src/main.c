@@ -145,25 +145,25 @@ void create_and_configure_folder() {
 
     
     // // Add configuration to smb.conf
-    // printf("\nopening the smb.conf file for the writing\n");
-    // FILE *smb_conf = fopen("/etc/samba/smb.conf","a");
-    // if (smb_conf == NULL) 
-    // {
-    //     printf("Failed to open smb.conf for writing.\n");
-    //     return;
-    // }
+    printf("\nopening the smb.conf file for the writing\n");
+    FILE *smb_conf = fopen("/etc/samba/smb.conf","a");
+    if (smb_conf == NULL) 
+    {
+        printf("Failed to open smb.conf for writing.\n");
+        return;
+    }
     
-    // fprintf(smb_conf, "[%s]\n", folder_name);
-    // fprintf(smb_conf, "   path = %s/%s\n",getenv("PW"),folder_name);
-    // fprintf(smb_conf, "   browseable = yes\n");
-    // fprintf(smb_conf, "   writable = yes\n");
-    // fprintf(smb_conf, "   valid users = ByteRevolution\n");
+    fprintf(smb_conf, "[%s]\n", folder_name);
+    fprintf(smb_conf, "   path = %s/%s\n",getenv("PWD"),folder_name);
+    fprintf(smb_conf, "   browseable = yes\n");
+    fprintf(smb_conf, "   writable = yes\n");
+    fprintf(smb_conf, "   valid users = ByteRevolution\n");
     
-    // fclose(smb_conf);
-    // system("exit");
+    fclose(smb_conf);
+    system("exit");
     
-    // printf("Folder '%s' created and configured for sharing.\n", folder_name);
-    system("bash ./server/src/smbconf.sh $folder_name");
+    printf("Folder '%s' created and configured for sharing.\n", folder_name);
+//     system("bash ./server/src/smbconf.sh $folder_name");
 }
 
 // Function to restart Samba service
