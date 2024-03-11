@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 void display_menu() {
     printf("File Transfer Application Menu\n");
@@ -24,7 +23,7 @@ int main() {
                 printf("Enter the file path for the sender: ");
                 scanf("%s", source_path);
                 char sender_command[200];
-                snprintf(sender_command, sizeof(sender_command), "./file_transfer_app.sh server %s", source_path);
+                snprintf(sender_command, sizeof(sender_command), "bash file_transfer_app.sh server %s", source_path);
                 system(sender_command);
                 break;
 
@@ -32,7 +31,7 @@ int main() {
                 printf("Enter the IP address of the sender: ");
                 scanf("%s", server_ip);
                 char receiver_command[200];
-                snprintf(receiver_command, sizeof(receiver_command), "./file_transfer_app.sh client %s", server_ip);
+                snprintf(receiver_command, sizeof(receiver_command), "bash file_transfer_app.sh client %s", server_ip);
                 system(receiver_command);
                 break;
 
@@ -47,3 +46,4 @@ int main() {
 
     return 0;
 }
+
