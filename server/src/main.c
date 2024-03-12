@@ -1,7 +1,7 @@
 #include "../../include/comman.h"
 #include "colors_effects.h"
 #include<sys/stat.h>
-#include<unistd.h>
+
 // Function to display menu
 void display_menu() {
     printf(YELLOW);
@@ -15,7 +15,7 @@ void display_menu() {
 
 // Function to configure an existing folder
 void configure_existing_folder() {
-    char folder_name[100];
+    char folder_name[100];  
     printf("please provide absolute path");
     printf("Enter the folder name to configure: ");
     fgets(folder_name, sizeof(folder_name), stdin);
@@ -70,6 +70,7 @@ void configure_existing_folder() {
         printf("Failed to open smb.conf for writing.\n");       
         return;
     }
+    
     
     fprintf(smb_conf, "[%s]\n", folder_name);
     fprintf(smb_conf, "   path = %s\n", folder_name);
