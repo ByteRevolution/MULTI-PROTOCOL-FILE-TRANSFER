@@ -29,6 +29,6 @@ $(OBJDIR)/client/%.o: $(SRCDIR2)/%.c $(DEPS)
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJDIR) $(BINDIR)
+	rm -rf $(OBJDIR) $(BINDIR) path.txt
 run :
 	@sudo ./bin/samba_conf
