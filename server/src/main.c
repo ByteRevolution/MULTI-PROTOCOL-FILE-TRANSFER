@@ -28,7 +28,10 @@ void configure_existing_folder() {
     
     // Check if folder exists
     if (system(NULL)) {
-        if (system("test -d \"$folder_name\"") != 0) {
+        char temp[150];
+        sprintf(temp,"test -d %s", folder_name);
+        int result = system(temp);
+        if (WEXITSTATUS(result) != 0) {
             printf("Folder '%s' does not exist.\n", folder_name);
             return;
         }
@@ -84,7 +87,8 @@ void configure_existing_folder() {
 }
 
 // Function to create and configure a new folder
-void create_and_configure_folder() {
+int create_and_configure_folder() 
+{
     char folder_name[100];
     printf("Enter the folder name to create and configure: ");
     fgets(folder_name, sizeof(folder_name), stdin);
@@ -93,57 +97,85 @@ void create_and_configure_folder() {
    
 
     // Remove trailing newline if present
-    if (folder_name[strlen(folder_name) - 1] == '\n') {
-        folder_name[strlen(folder_name) - 1] = '\0';
+    // if (folder_name[strlen(folder_name) - 1] == '\n') {
+    //     folder_name[strlen(folder_name) - 1] = '\0';
+    // }
+
+    // if (system(NULL)) 
+    // {
+    //     if (system("grep -q '^ByteRevolution:' /etc/passwd") != 0) 
+    //     {
+    //         if (system("sudo useradd ByteRevolution -m -s /sbin/nologin -G sambashare") != 0) 
+    //         {
+    //             printf("Failed to create user 'ByteRevolution'.\n");
+    //             return;
+    //         }
+    //         if (system("(echo -e 'revolve\nrevolve' | sudo smbpasswd -a ByteRevolution) && sudo smbpasswd -e ByteRevolution") != 0) 
+    //         {
+    //         printf("Failed to set password for 'ByteRevolution'.\n");
+    //         return;
+    //         }
+    //         printf("Password set for user 'ByteRevolution'.\n");
+    //         printf("User 'ByteRevolution' created.\n");
+    //     } 
+    //     else 
+    //     {
+    //         printf("User 'ByteRevolution' already exists.\n");
+    //     }    
+    // } 
+    // else 
+    // {
+    //     printf("System command not available.\n");
+    //     return;
+    // }
+    if (!system(NULL)) {
+        printf("System command not available.\n");
+        return 1;
     }
 
-    if (system(NULL)) 
+    if (system("grep -q '^ByteRevolution:' /etc/passwd") == 0) {
+        printf("User 'ByteRevolution' already exists.\n");
+     
+    }
+    if(system("sudo useradd ByteRevolution -m -s /sbin/nologin -G sambashare") == 0)
     {
-        if (system("grep -q '^ByteRevolution:' /etc/passwd") != 0) 
-        {
-            if (system("sudo useradd ByteRevolution -m -s /sbin/nologin -G ByteRevolution") != 0) 
-            {
-                printf("Failed to create user 'ByteRevolution'.\n");
-                return;
-            }
-            if (system("(echo -e 'revolve\nrevolve' | sudo smbpasswd -a ByteRevolution) && sudo smbpasswd -e ByteRevolution") != 0) 
-            {
-            printf("Failed to set password for 'ByteRevolution'.\n");
-            return;
-        }
-            printf("Password set for user 'ByteRevolution'.\n");
-            printf("User 'ByteRevolution' created.\n");
-        } 
-        else 
-        {
-            printf("User 'ByteRevolution' already exists.\n");
-        }    
-    } 
-    else 
+        printf("User 'ByteRevolution' created.\n");
+    }
+    else
+    { 
+        printf("Failed to create user 'ByteRevolution'.\n");
+        return 1;
+    }
+
+    if (system("(echo -e 'revolve\nrevolve' | sudo smbpasswd -a ByteRevolution) && sudo smbpasswd -e ByteRevolution") == 0) 
     {
-        printf("System command not available.\n");
-        return;
+         printf("Password set for user 'ByteRevolution'.\n");
+    }
+    else
+    {
+        printf("Failed to set password for 'ByteRevolution'.\n");
+        return 1;
     }
 
     if (strlen(folder_name) == 0) {
         printf("Folder name cannot be empty.\n");
-        return;
+        return 1;
     }
     
     // Create folder
-    if (system(NULL)) {
-        
-    if ((mkdir(folder_name,0777))!= 0)
-    {
+    if (system(NULL)) 
+    {    
+        if ((mkdir(folder_name,0777))!= 0)
+        {
         printf("Failed to create folder '%s'.\n", folder_name);
-        return;
-    }
+        return 1;
+        }
     } 
     else 
     {
     printf("System command not available.\n");
-    return;
-}
+    return 1;
+    }
 
     
     // // Add configuration to smb.conf
@@ -152,7 +184,7 @@ void create_and_configure_folder() {
     if (smb_conf == NULL) 
     {
         printf("Failed to open smb.conf for writing.\n");
-        return;
+        return 1;
     }
     system("bash ./server/src/pwd.sh > path.txt");
     FILE *path_file = fopen("path.txt","r");
@@ -170,6 +202,7 @@ void create_and_configure_folder() {
    
     
     printf("Folder '%s' created and configured for sharing.\n", folder_name);
+    return 0;
 //     system("bash ./server/src/smbconf.sh $folder_name");
 }
 
