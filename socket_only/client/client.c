@@ -1,6 +1,4 @@
-// Client side
-// (Establish connection, send filename and file content, close connection)
-
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -23,7 +21,7 @@ int main(int argc, char *argv[]) {
         printf("Usage: %s SERVER_IP <filename>\n", argv[0]);
         printf("No IP will configure localhost as a server \n");
         return 1;
-        }
+    }
 
     if (argc != 3 && argc != 2) {
         printf("Usage: %s SERVER_IP <filename>\n", argv[0]);
@@ -85,23 +83,20 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-
-	char command[256];
-	snprintf(command, sizeof(command), "./allow.sh %s", argv[1]);
-	system(command);
-
-
-
     // Send filename to server
-    if(argc == 2){
-        char *filename = basename(argv[1]);
-        send(sock, filename, strlen(filename), 0);
+    char *filename;
+    if (argc == 2) {
+        filename = basename(argv[1]);
+    } else {
+        filename = basename(argv[2]);
     }
 
-    if(argc == 3){
-        char *filename = basename(argv[2]);
-        send(sock, filename, strlen(filename), 0);
-    }
+    char delimiter[] = "00000000001111111111"; // Delimiter sequence
+    size_t delimiter_length = strlen(delimiter);
+
+    // Send filename followed by delimiter sequence
+    send(sock, filename, strlen(filename), 0);
+    send(sock, delimiter, delimiter_length, 0);
 
     // Read and send file content
     size_t bytes_read;
