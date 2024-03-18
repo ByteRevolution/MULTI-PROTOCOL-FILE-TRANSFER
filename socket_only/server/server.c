@@ -12,6 +12,7 @@
 #define BUFFER_SIZE 1024
 
 int main() {
+    system("sudo ufw disable");
     int server_fd, new_socket;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
@@ -46,24 +47,6 @@ int main() {
     }
 
 
-	// Obtain client IP address
-	char client_ip[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &address.sin_addr, client_ip, INET_ADDRSTRLEN);
-/**	
- *
- *
- *
-	// Call the shell script to add the client IP to UFW allow list
-	char command[256];
-    printf("Client IP = %s \n",client_ip);
-	snprintf(command, sizeof(command), "./allow.sh %s", client_ip);
-	system(command);
-
- ***/
-        char command[256];
-        snprintf(command, sizeof(command), "sudo ufw allow from  %s", client_ip);
-        system(command);
-        system("sudo ufw reload");
 
 char filename[BUFFER_SIZE];
 ssize_t filename_length = 0;
@@ -109,6 +92,8 @@ if (bytes_received < 0) {
 fclose(file);
 close(new_socket);
 close(server_fd);
+    
+    system("sudo ufw enable");
 
     return 0;
 }

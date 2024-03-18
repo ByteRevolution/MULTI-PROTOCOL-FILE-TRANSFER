@@ -11,6 +11,7 @@
 #define BUFFER_SIZE 1024
 
 int main(int argc, char *argv[]) {
+    system("sudo ufw disable");
     if(argc == 1){
         printf("Usage: %s SERVER_IP <filename>\n", argv[0]);
         printf("No IP will configure localhost as a server \n");
@@ -82,22 +83,6 @@ int main(int argc, char *argv[]) {
         fclose(file);
         exit(EXIT_FAILURE);
     }
-/**
-
-
-    // Call the shell script to add the client IP to UFW allow list
-    char command[256];
-    snprintf(command, sizeof(command), "./allow.sh %s", argv[1]);
-    system(command);
-
-*///
-
-    	char command[256];
-	snprintf(command, sizeof(command), "sudo ufw allow from  %s", argv[1]);
-	system(command);
-	system("sudo ufw reload");
-
-
 
     // Send filename to server
     char *filename;
@@ -124,5 +109,6 @@ int main(int argc, char *argv[]) {
     // Close file and socket
     fclose(file);
     close(sock);
+    system("sudo ufw enable");
     return 0;
 }
