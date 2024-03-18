@@ -9,4 +9,5 @@
 .vscode/
 # Ignore temporary files
 *~
-
+#ignore binary files
+*.bin
