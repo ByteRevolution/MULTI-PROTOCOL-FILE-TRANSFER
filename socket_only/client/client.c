@@ -13,6 +13,11 @@
 #define BUFFER_SIZE 1024
 
 int main(int argc, char *argv[]) {
+    if(argc == 1){
+        printf("Usage: %s SERVER_IP <filename>\n", argv[0]);
+        printf("No IP will configure localhost as a server \n");
+        return 1;
+	}	
 
     if( !(strcmp(argv[1],"--help")) || !(strcmp(argv[1],"-h")) ){
         printf("Usage: %s SERVER_IP <filename>\n", argv[0]);
@@ -79,6 +84,13 @@ int main(int argc, char *argv[]) {
         fclose(file);
         exit(EXIT_FAILURE);
     }
+
+
+	char command[256];
+	snprintf(command, sizeof(command), "./allow.sh %s", argv[1]);
+	system(command);
+
+
 
     // Send filename to server
     if(argc == 2){

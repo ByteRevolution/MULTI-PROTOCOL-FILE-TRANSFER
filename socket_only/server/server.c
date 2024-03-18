@@ -45,6 +45,20 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+
+	// Obtain client IP address
+	char client_ip[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &address.sin_addr, client_ip, INET_ADDRSTRLEN);
+	
+	// Call the shell script to add the client IP to UFW allow list
+	char command[256];
+	snprintf(command, sizeof(command), "./allow.sh %s", client_ip);
+	system(command);
+
+
+
+
+
     // Receive file path from client
     ssize_t path_length = recv(new_socket, buffer, BUFFER_SIZE, 0);
     if (path_length <= 0) {
