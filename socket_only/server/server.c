@@ -57,7 +57,7 @@ int main() {
 
 
 
-
+/*
 
     // Receive file path from client
     ssize_t path_length = recv(new_socket, buffer, BUFFER_SIZE, 0);
@@ -70,27 +70,56 @@ int main() {
     // Extract filename from the path
     char *filename = basename(buffer);
     printf("Received : %s\n", filename);
+*/
 
-    // Open file with the received file name for writing
-    FILE *file = fopen(filename, "wb");
-    if (!file) {
-        perror("File creation failed");
+
+char filename[BUFFER_SIZE];
+ssize_t filename_length = 0;
+
+while (1) {
+    ssize_t bytes_received = recv(new_socket, filename + filename_length, 1, 0); // Receive one byte at a time
+    if (bytes_received <= 0) {
+        perror("Failed to receive file path");
         exit(EXIT_FAILURE);
     }
 
-    // Receive and write file content
-    ssize_t bytes_received;
-    while ((bytes_received = recv(new_socket, buffer, BUFFER_SIZE, 0)) > 0) {
-        fwrite(buffer, 1, bytes_received, file);
-    }
-    if (bytes_received < 0) {
-        perror("Receive failed");
-        exit(EXIT_FAILURE);
+    // Check if we received the delimiter (e.g., 10 zeros followed by 10 ones)
+    if (filename_length >= 20 && memcmp(filename + filename_length - 20, "00000000001111111111", 20) == 0) {
+        filename_length -= 20; // Remove the delimiter from the filename
+        filename[filename_length] = '\0'; // Null terminate the filename
+        break; // Stop receiving filename
     }
 
-    // Close file and connection
-    fclose(file);
-    close(new_socket);
-    close(server_fd);
+    filename_length++; // Increment filename length
+}
+
+printf("Received filename: %s\n", filename);
+
+// Open file with the received filename for writing
+FILE *file = fopen(filename, "wb");
+if (!file) {
+    perror("File creation failed");
+    exit(EXIT_FAILURE);
+}
+
+// Receive and write file content
+ssize_t bytes_received;
+while ((bytes_received = recv(new_socket, buffer, BUFFER_SIZE, 0)) > 0) {
+    fwrite(buffer, 1, bytes_received, file);
+}
+
+if (bytes_received < 0) {
+    perror("Receive failed");
+    exit(EXIT_FAILURE);
+}
+
+// Close file and connection
+fclose(file);
+close(new_socket);
+close(server_fd);
+
+
+
+
     return 0;
 }
