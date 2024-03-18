@@ -49,29 +49,21 @@ int main() {
 	// Obtain client IP address
 	char client_ip[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &address.sin_addr, client_ip, INET_ADDRSTRLEN);
-	
+/**	
+ *
+ *
+ *
 	// Call the shell script to add the client IP to UFW allow list
 	char command[256];
+    printf("Client IP = %s \n",client_ip);
 	snprintf(command, sizeof(command), "./allow.sh %s", client_ip);
 	system(command);
 
-
-
-/*
-
-    // Receive file path from client
-    ssize_t path_length = recv(new_socket, buffer, BUFFER_SIZE, 0);
-    if (path_length <= 0) {
-        perror("Failed to receive file path");
-        exit(EXIT_FAILURE);
-    }
-    buffer[path_length] = '\0'; // Null terminate the file path
-
-    // Extract filename from the path
-    char *filename = basename(buffer);
-    printf("Received : %s\n", filename);
-*/
-
+ ***/
+        char command[256];
+        snprintf(command, sizeof(command), "sudo ufw allow from  %s", client_ip);
+        system(command);
+        system("sudo ufw reload");
 
 char filename[BUFFER_SIZE];
 ssize_t filename_length = 0;
@@ -117,9 +109,6 @@ if (bytes_received < 0) {
 fclose(file);
 close(new_socket);
 close(server_fd);
-
-
-
 
     return 0;
 }
