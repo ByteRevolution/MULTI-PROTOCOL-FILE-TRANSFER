@@ -82,6 +82,22 @@ int main(int argc, char *argv[]) {
         fclose(file);
         exit(EXIT_FAILURE);
     }
+/**
+
+
+    // Call the shell script to add the client IP to UFW allow list
+    char command[256];
+    snprintf(command, sizeof(command), "./allow.sh %s", argv[1]);
+    system(command);
+
+*///
+
+    	char command[256];
+	snprintf(command, sizeof(command), "sudo ufw allow from  %s", argv[1]);
+	system(command);
+	system("sudo ufw reload");
+
+
 
     // Send filename to server
     char *filename;

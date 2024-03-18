@@ -8,3 +8,4 @@ fi
 
 # Add server IP to UFW allow list
 sudo ufw allow from $1
+sudo ufw reload
